@@ -31,10 +31,13 @@ class ApiController extends Controller
 
         $token = $user->createToken('YourAppName')->plainTextToken;
 
-        return response()->json([
+        $data = [
+            'success' => true,
             'token' => $token,
-            'user' => $user
-        ]);
+            'user' => $user,
+        ];
+
+        return response()->json($data, 200);
     }
 
     //Login API (POST, formdata)
@@ -59,10 +62,12 @@ class ApiController extends Controller
             return response()->json(['error' => 'Could not create token'], 500);
         }
 
-        return response()->json([
+        $data = [
+            'success' => true,
             'token' => $token,
             'user' => Auth::user()
-        ]);
+        ];
+        return response()->json($data, 200);
     }
 
      //Logout API (GET)

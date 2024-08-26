@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ApiController;
+use App\Http\Controllers\Api\TasksController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -14,9 +16,9 @@ use App\Http\Controllers\Api\ApiController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+/* Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
-});
+}); */
 
 //API Routes
 Route::post('register', [ApiController::class, 'register']);
@@ -30,4 +32,8 @@ Route::group([
     Route::get('refresh', [ApiController::class, 'refreshToken']);
     Route::get('logout', [ApiController::class, 'logout']);
 
+
+    Route::post('tasks/add', [TasksController::class, 'create']);
+    Route::put('tasks/{id}', [TasksController::class, 'edit']);
+    Route::get('tasks', [TasksController::class, 'show']);
 });
