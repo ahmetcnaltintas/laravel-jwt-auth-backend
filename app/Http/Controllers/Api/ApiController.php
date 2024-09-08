@@ -70,11 +70,12 @@ class ApiController extends Controller
         return response()->json($data, 200);
     }
 
-     //Logout API (GET)
-     public function logout(Request $request)
-     {
+    //Logout API (GET)
+    public function logout(Request $request)
+    {
         $request->user()->currentAccessToken()->delete();
-     }
+        return response()->json(['message' => 'Successfully logged out']);
+    }
 
     //Profile API (GET)
     public function profile()
@@ -82,10 +83,20 @@ class ApiController extends Controller
         return response()->json(auth()->user());
     }
 
-     //Refresh Token API (GET)
-     public function refreshToken()
-     {
+    //Refresh Token API (GET)
+    public function refresh()
+    {
+        try {
+            $newToken = JWTAuth::refresh();
+            return response()->json([
+                'access_token' => $newToken,
+                'token_type' => 'bearer',
+                'expires_in' => config('jwt.ttl') * 60
+            ]);
+        } catch (JWTException $e) {
+            return response()->json(['error' => 'Token could not be refreshed'], 500);
+        }
+    }
 
-     }
 
 }
