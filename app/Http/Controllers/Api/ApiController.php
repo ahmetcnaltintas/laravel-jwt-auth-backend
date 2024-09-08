@@ -11,10 +11,9 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
-
 class ApiController extends Controller
 {
-    //Register API (POST, formdata)
+    // Register API (POST, formdata)
     public function register(Request $request)
     {
         $request->validate([
@@ -29,7 +28,7 @@ class ApiController extends Controller
             'password' => bcrypt($request->password),
         ]);
 
-        $token = $user->createToken('YourAppName')->plainTextToken;
+        $token = JWTAuth::fromUser($user);
 
         $data = [
             'success' => true,
@@ -40,7 +39,7 @@ class ApiController extends Controller
         return response()->json($data, 200);
     }
 
-    //Login API (POST, formdata)
+    // Login API (POST, formdata)
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -70,33 +69,45 @@ class ApiController extends Controller
         return response()->json($data, 200);
     }
 
-    //Logout API (GET)
+    // Logout API (POST)
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
-        return response()->json(['message' => 'Successfully logged out']);
-    }
-
-    //Profile API (GET)
-    public function profile()
-    {
-        return response()->json(auth()->user());
-    }
-
-    //Refresh Token API (GET)
-    public function refresh()
-    {
         try {
-            $newToken = JWTAuth::refresh();
-            return response()->json([
-                'access_token' => $newToken,
-                'token_type' => 'bearer',
-                'expires_in' => config('jwt.ttl') * 60
-            ]);
+            $token = JWTAuth::getToken();
+            if (!$token) {
+                return response()->json(['error' => 'Token not provided'], 400);
+            }
+
+            JWTAuth::invalidate($token);
+            return response()->json(['message' => 'Successfully logged out']);
         } catch (JWTException $e) {
-            return response()->json(['error' => 'Token could not be refreshed'], 500);
+            return response()->json(['error' => 'Failed to logout, please try again.'], 500);
         }
     }
 
+    // Refresh Token API (POST)
+    public function refresh(Request $request)
+    {
+        $token = $request->bearerToken();
 
+        if (!$token) {
+            return response()->json(['error' => 'Token not provided'], 400);
+        }
+
+        try {
+            $newToken = JWTAuth::refresh($token);
+            return response()->json([
+                'success' => true,
+                'token' => $newToken,
+            ]);
+        } catch (JWTException $e) {
+            return response()->json(['error' => 'Could not refresh token'], 500);
+        }
+    }
+
+    // Profile API (GET)
+    public function profile()
+    {
+        return response()->json(Auth::user());
+    }
 }

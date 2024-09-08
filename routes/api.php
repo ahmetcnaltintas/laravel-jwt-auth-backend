@@ -1,10 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\ApiController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\TasksController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,20 +18,11 @@ use App\Http\Controllers\Api\TasksController;
 Route::post('register', [ApiController::class, 'register']);
 Route::post('login', [ApiController::class, 'login']);
 
-// Protected routes
-Route::middleware('auth:sanctum')->group(function () {
-    // User related routes
-    Route::get('/user', [ApiController::class, 'getUser']);
-    Route::get('user/profile', [ApiController::class, 'profile']);
-    Route::post('logout', [ApiController::class, 'logout']);
-    Route::get('refresh', [ApiController::class, 'refreshToken']);
+// Authenticated routes
+Route::middleware('auth:api')->group(function () {
 
-    // Tasks related routes
-    Route::prefix('tasks')->group(function () {
-        Route::get('/', [TasksController::class, 'index']);
-        Route::post('/', [TasksController::class, 'store']);
-        Route::get('/{id}', [TasksController::class, 'show']);
-        Route::put('/{id}', [TasksController::class, 'update']);
-        Route::delete('/{id}', [TasksController::class, 'destroy']);
-    });
+    Route::post('logout', [ApiController::class, 'logout']);
+    Route::post('refresh-token', [ApiController::class, 'refresh']);
+
+    Route::get('/user', [ApiController::class, 'profile']);
 });
