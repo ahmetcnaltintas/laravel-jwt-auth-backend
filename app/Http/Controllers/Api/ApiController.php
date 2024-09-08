@@ -71,9 +71,9 @@ class ApiController extends Controller
     }
 
      //Logout API (GET)
-     public function logout()
+     public function logout(Request $request)
      {
-
+        $request->user()->currentAccessToken()->delete();
      }
 
     //Profile API (GET)
