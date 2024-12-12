@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -14,61 +16,68 @@ use Illuminate\Support\Facades\Auth;
 class ApiController extends Controller
 {
     // Register API (POST, formdata)
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-        ]);
-
-        $token = JWTAuth::fromUser($user);
-
-        $data = [
-            'success' => true,
-            'token' => $token,
-            'user' => $user,
-        ];
-
-        return response()->json($data, 200);
-    }
-
-    // Login API (POST, formdata)
-    public function login(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 400);
-        }
-
-        $credentials = $request->only('email', 'password');
-
         try {
-            if (!$token = JWTAuth::attempt($credentials)) {
-                return response()->json(['error' => 'Invalid credentials'], 401);
-            }
-        } catch (JWTException $e) {
-            return response()->json(['error' => 'Could not create token'], 500);
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => bcrypt($request->password),
+            ]);
+
+            $token = JWTAuth::fromUser($user);
+
+            $data = [
+                'success' => true,
+                'token' => $token,
+                'user' => $user,
+            ];
+
+            return response()->json($data, 200);
+        } catch (\Exception $err) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Kayıt işlemi sırasında bir hata oluştu!',
+                'error' => $err->getMessage(),
+            ], 500);
         }
-
-        $data = [
-            'success' => true,
-            'token' => $token,
-            'user' => Auth::user()
-        ];
-        return response()->json($data, 200);
     }
+    // Login API (POST, formdata)
+    public function login(LoginRequest $request)
+    {
+        try {
+            $credentials = $request->only('email', 'password');
 
+            if (!$token = JWTAuth::attempt($credentials)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'E-posta veya şifre hatalı!',
+                ], 401);
+            }
+
+            $data = [
+                'success' => true,
+                'token' => $token,
+                'user' => Auth::user(),
+            ];
+            return response()->json($data, 200);
+
+        } catch (JWTException $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Token oluşturulamadı!',
+            ], 500);
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Giriş işlemi sırasında bir hata oluştu!',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
     // Logout API (POST)
     public function logout(Request $request)
     {
@@ -84,7 +93,6 @@ class ApiController extends Controller
             return response()->json(['error' => 'Failed to logout, please try again.'], 500);
         }
     }
-
     // Refresh Token API (POST)
     public function refresh(Request $request)
     {
@@ -104,7 +112,6 @@ class ApiController extends Controller
             return response()->json(['error' => 'Could not refresh token'], 500);
         }
     }
-
     // Profile API (GET)
     public function profile()
     {
