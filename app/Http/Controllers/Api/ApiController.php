@@ -113,8 +113,10 @@ class ApiController extends Controller
         }
     }
     // Profile API (GET)
-    public function profile()
+    public function profile(Request $request)
     {
-        return response()->json(Auth::user());
+        return response()->json([
+            'user' => $request->user(),
+        ]);
     }
 }
