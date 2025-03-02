@@ -7,14 +7,17 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
 class ApiController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+    }
+
     // Register API (POST, formdata)
     public function register(RegisterRequest $request)
     {
@@ -27,22 +30,20 @@ class ApiController extends Controller
 
             $token = JWTAuth::fromUser($user);
 
-            $data = [
+            return response()->json([
                 'success' => true,
                 'token' => $token,
                 'user' => $user,
-            ];
-
-            return response()->json($data, 200);
-        } catch (\Exception $err) {
-
+            ], 201);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Kayıt işlemi sırasında bir hata oluştu!',
-                'error' => $err->getMessage(),
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
+
     // Login API (POST, formdata)
     public function login(LoginRequest $request)
     {
@@ -56,21 +57,17 @@ class ApiController extends Controller
                 ], 401);
             }
 
-            $data = [
+            return response()->json([
                 'success' => true,
                 'token' => $token,
                 'user' => Auth::user(),
-            ];
-            return response()->json($data, 200);
-
+            ], 200);
         } catch (JWTException $e) {
-
             return response()->json([
                 'success' => false,
                 'message' => 'Token oluşturulamadı!',
             ], 500);
         } catch (\Exception $e) {
-
             return response()->json([
                 'success' => false,
                 'message' => 'Giriş işlemi sırasında bir hata oluştu!',
@@ -78,45 +75,60 @@ class ApiController extends Controller
             ], 500);
         }
     }
+
     // Logout API (POST)
-    public function logout(Request $request)
+    public function logout()
     {
         try {
-            $token = JWTAuth::getToken();
-            if (!$token) {
-                return response()->json(['error' => 'Token not provided'], 400);
-            }
-
-            JWTAuth::invalidate($token);
-            return response()->json(['message' => 'Successfully logged out']);
+            JWTAuth::invalidate(JWTAuth::getToken());
+            return response()->json([
+                'success' => true,
+                'message' => 'Çıkış işlemi başarılı!',
+            ], 200);
         } catch (JWTException $e) {
-            return response()->json(['error' => 'Failed to logout, please try again.'], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Çıkış işlemi sırasında bir hata oluştu!',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
+
     // Refresh Token API (POST)
-    public function refresh(Request $request)
+    public function refresh()
     {
-        $token = $request->bearerToken();
-
-        if (!$token) {
-            return response()->json(['error' => 'Token not provided'], 400);
-        }
-
         try {
-            $newToken = JWTAuth::refresh($token);
+            $newToken = JWTAuth::refresh(JWTAuth::getToken());
+
             return response()->json([
                 'success' => true,
                 'token' => $newToken,
-            ]);
+            ], 200);
         } catch (JWTException $e) {
-            return response()->json(['error' => 'Could not refresh token'], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Token yenileme sırasında bir hata oluştu!',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
+
     // Profile API (GET)
-    public function profile(Request $request)
+    public function profile()
     {
-        return response()->json([
-            'user' => $request->user(),
-        ]);
+        try {
+            $user = Auth::user();
+
+            return response()->json([
+                'success' => true,
+                'user' => $user,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Profil bilgisi alınırken bir hata oluştu!',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

@@ -13,5 +13,5 @@ Route::middleware('auth:api')->group(function () {
     Route::post('logout', [ApiController::class, 'logout']);
     Route::post('refresh-token', [ApiController::class, 'refresh']);
 
-    Route::get('/user', [ApiController::class, 'user']);
+    Route::get('/user', [ApiController::class, 'profile']);
 });
