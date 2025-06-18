@@ -1,39 +1,43 @@
 <h1 align="center">🔐 Laravel JWT Auth Backend</h1>
-<p align="center">RESTful API developed with Laravel, implementing JWT authentication for mobile frontend apps</p>
+<p align="center">"A Laravel REST API project with JWT authentication and MySQL integration"</p>
 
 ---
 
 ## 🎯 Proje Hakkında
 
-Bu proje, Laravel kullanılarak geliştirilmiş bir **RESTful API** uygulamasıdır.  
-JWT (JSON Web Token) tabanlı kimlik doğrulama sistemi ile güvenli giriş/kayıt işlemleri sağlamaktadır.  
-Veritabanı olarak **MySQL** kullanılmaktadır.
-
-Bu backend API, [expo-jwt-auth-frontend](https://github.com/ahmetcnaltintas/expo-jwt-auth-frontend) React Native uygulamasına hizmet vermek için geliştirilmiştir.
+Bu proje, Laravel ile geliştirilmiş bir **RESTful API** backend uygulamasıdır.  
+JWT (JSON Web Token) kullanılarak kullanıcı kimlik doğrulama işlemleri yapılmaktadır.  
+Frontend olarak kullanılan mobil uygulama: [expo-jwt-auth-frontend](https://github.com/ahmetcnaltintas/expo-jwt-auth-frontend)
 
 ---
 
-## 🚀 API Özellikleri
+## ⚙️ API Özellikleri
 
 - Kullanıcı Kaydı (Register)  
-- Kullanıcı Girişi (Login)  
-- Token Yenileme (Refresh)  
-- Kimlik Doğrulama ve Kullanıcı Bilgisi Alma  
-- Kullanıcı Çıkışı (Logout)
+- Giriş (Login)  
+- Çıkış (Logout)  
+- Kullanıcı Bilgisi Alma (Me)  
+- Token Yenileme (Refresh)
 
 ---
 
-## ⚙️ Teknolojiler
+## 🛠️ Kullanılan Teknolojiler
 
 - Laravel  
-- JWT (tymon/jwt-auth paketi)  
 - MySQL  
-- Laravel Sanctum (isteğe bağlı)  
-- RESTful API standardı
+- JWT (tymon/jwt-auth paketi)  
+- RESTful API yapısı
 
 ---
 
-## 🔧 Kurulum (Local Geliştirme)
+## 📷 Ekran Görüntüsü
 
-```bash
-git clone https://github.com/ahmetcnalt
+> Şu anda ekran görüntüsü mevcut değildir.
+
+---
+
+## 📫 İletişim
+
+E-posta: **ahmetcnaltintas@gmail.com**  
+Web sitesi: [ahmetcnaltintas.com](https://ahmetcnaltintas.com)  
+LinkedIn: [linkedin.com/in/ahmet-can-altinta%C5%9F-73840a2a4/](https://www.linkedin.com/in/ahmet-can-altinta%C5%9F-73840a2a4/)
